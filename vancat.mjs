@@ -4,6 +4,8 @@
  */
 
 var Vancat = (function () {
+    const registeredHelpers = {};
+    const registerHelper = (name, f) => (registeredHelpers[name] = f);
     const compile = (template) => {
         const statements = [];
         let end = 0;
@@ -20,7 +22,7 @@ var Vancat = (function () {
             contextData['$'] = data;
             const context = {
                 get(key) {
-                    return contextData[key] ?? helpers[key] ?? data[key];
+                    return contextData[key] ?? helpers[key] ?? registeredHelpers[key] ?? data[key];
                 },
                 set(name, val) {
                     contextData[name] = val;
@@ -280,6 +282,6 @@ var Vancat = (function () {
         if (obj == null) return false;
         return typeof obj[Symbol.iterator] === 'function';
     };
-    return { compile };
+    return { compile, registerHelper };
 })();
 export default Vancat;

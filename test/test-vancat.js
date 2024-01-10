@@ -1,7 +1,5 @@
 import Vancat from '../vancat.mjs';
 
-const { compile } = Vancat;
-
 var tests = [
     ['', {}, ''],
     ['hello world', {}, 'hello world'],
@@ -58,6 +56,7 @@ var tests = [
     ['{{for k,v in $}}{{k}}:{{v}},{{end}}', { name: 'Jack', age: 25 }, 'name:Jack,age:25,'],
     ['{{for x in $}}{{x}},{{end}}', testGenerator(), '1,2,3,'],
     ['{{for e in $}}{{set k fixed e}}{{k}},{{end}}', [1, 2, 3], '1.00,2.00,3.00,'],
+    ["{{if not data}}It's not{{else}}it is{{end}}", { data: false }, "It's not"],
 ];
 
 var helpers = {
@@ -83,8 +82,10 @@ var helpers = {
     },
 };
 
+Vancat.registerHelper('not', (x) => !x);
+
 for (const [template, data, expected] of tests) {
-    const renderer = compile(template);
+    const renderer = Vancat.compile(template);
     const result = renderer(data, helpers);
     if (result !== expected) throw new Error();
 }
