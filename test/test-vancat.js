@@ -90,11 +90,40 @@ for (const [template, data, expected] of tests) {
     if (result !== expected) throw new Error();
 }
 
-var badCompileTests = ['{{', '{{}}', '{{x.}}', '{{x.x.}}', '{{.x}}', '{{.x.x}}', '{{x.x x.x}}'];
+var badCompileTests = [
+    '{{',
+    '{{}}',
+    '{{x.}}',
+    '{{x.x.}}',
+    '{{.x}}',
+    '{{.x.x}}',
+    '{{x.x x.x}}',
+    '{{if}}',
+    '{{else',
+    '{{end',
+    '{{if x}}',
+    '{{if}}{{end}}',
+    '{{if x}}{{}}',
+    '{{if x}}}}',
+    '{{if x}}{{',
+    '{{for}}',
+    '{{for x}}',
+    '{{for x in }}',
+    '{{for x range }}',
+    '{{for in }}',
+    '{{for x in k}}',
+    '{{for in k}}',
+    '{{end}}',
+    '{{else}}',
+    '{{else if}}',
+    '{{if $}}{{',
+    '{{if $}}{{end}}{{',
+    '{{if $}}{{end}}{{else',
+];
 
 for (let k of badCompileTests) {
     try {
-        Templater.compile(k);
+        Vancat.compile(k);
     } catch (e) {
         continue;
     }

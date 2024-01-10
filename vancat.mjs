@@ -148,6 +148,8 @@ var Vancat = (function () {
                 }
             } else if (first === 'end') {
                 return [null, end];
+            } else if (first === 'else') {
+                throw new Error('Unexpected else token');
             } else if (first === 'set') {
                 const varName = tokens[1];
                 const expr = getExpression(tokens, 2);
@@ -228,6 +230,9 @@ var Vancat = (function () {
         const parsedNumber = Number(token);
         if (!isNaN(parsedNumber)) return (context) => parsedNumber;
         const subTokens = token.split('.');
+        for (const x of subTokens) {
+            if (!x) throw new Error(`Invalid member access expression: ${token}`);
+        }
         const t = subTokens[0];
         if (subTokens.length == 1) {
             return (context) => context.get(t);
