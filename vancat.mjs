@@ -146,6 +146,11 @@ var Vancat = (function () {
                 }
             } else if (first === 'end') {
                 return [null, end];
+            } else if (first === 'set') {
+                const varName = tokens[1];
+                const expr = getExpression(tokens, 2);
+                const statement = (writer, context) => context.set(varName, expr(context));
+                return [statement, end];
             }
             // Get expression as statement
             const expr = getExpression(tokens, 0);

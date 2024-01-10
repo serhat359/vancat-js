@@ -57,6 +57,7 @@ var tests = [
     ['{{for x in $}}{{1.5}},{{end}}', ['', '', '', ''], '1.5,1.5,1.5,1.5,'],
     ['{{for k,v in $}}{{k}}:{{v}},{{end}}', { name: 'Jack', age: 25 }, 'name:Jack,age:25,'],
     ['{{for x in $}}{{x}},{{end}}', testGenerator(), '1,2,3,'],
+    ['{{for e in $}}{{set k fixed e}}{{k}},{{end}}', [1, 2, 3], '1.00,2.00,3.00,'],
 ];
 
 var helpers = {
