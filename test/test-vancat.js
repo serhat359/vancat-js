@@ -55,6 +55,7 @@ var tests = [
     ['{{if lt x 2}}less than two{{end}}', { x: 1 }, 'less than two'],
     ['{{sum $.n $.n $.n $.n}}', { n: 25 }, '100'],
     ['{{for x in $}}{{1.5}},{{end}}', ['', '', '', ''], '1.5,1.5,1.5,1.5,'],
+    ['{{for k,v in $}}{{k}}:{{v}},{{end}}', { name: 'Jack', age: 25 }, 'name:Jack,age:25,'],
 ];
 
 var helpers = {

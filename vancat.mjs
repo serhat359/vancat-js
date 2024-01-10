@@ -51,14 +51,22 @@ var Vancat = (function () {
                 [statements, end] = getInnerStatements(template, end);
                 const forStatement = (writer, context) => {
                     const loopValues = loopValuesExpr(context);
-                    if (!isIterable(loopValues))
+                    if (loopValues == null)
                         throw new Error(`Value of '${tokens.slice(3).join(' ')}' was not iterable`);
-                    let i = 0;
-                    for (const val of loopValues) {
-                        context.set(t1, val);
-                        if (t2) context.set(t2, i);
-                        runStatements(writer, context, statements);
-                        i++;
+                    if (isIterable(loopValues)) {
+                        let i = 0;
+                        for (const val of loopValues) {
+                            context.set(t1, val);
+                            if (t2) context.set(t2, i);
+                            runStatements(writer, context, statements);
+                            i++;
+                        }
+                    } else {
+                        for (const key in loopValues) {
+                            context.set(t1, key);
+                            context.set(t2, loopValues[key]);
+                            runStatements(writer, context, statements);
+                        }
                     }
                 };
                 return [forStatement, end];
