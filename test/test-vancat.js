@@ -30,6 +30,17 @@ var tests = [
     ],
     ['the number is {{if b}}there{{end}}', { b: 2 }, 'the number is there'],
     ['the number is {{if b}}there{{else}}NOT there{{end}}', { b: 0 }, 'the number is NOT there'],
+    ['the number is {{if b}}there{{else if y}}up there{{end}}', { y: 5 }, 'the number is up there'],
+    [
+        'the number is {{if b}}there{{else if y}}up there{{else if x}}down there{{end}}',
+        { y: 0, x: 5 },
+        'the number is down there',
+    ],
+    [
+        'the number is {{if b}}there{{else if y}}up there{{else if x}}down there{{else}}on left{{end}}',
+        { y: 0, x: 0 },
+        'the number is on left',
+    ],
 ];
 
 var helpers = {

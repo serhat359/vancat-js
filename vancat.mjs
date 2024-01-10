@@ -66,37 +66,70 @@ var Vancat = (function () {
                 const ifExpr = getExpression(tokens, 1);
                 let ifStatements = [];
                 let elseStatements = [];
+                let elseIfGroups = [];
                 let nextType;
                 let statement;
-                const createIfStatement = () => (writer, context) => {
-                    if (ifExpr(context)) {
-                        runStatements(writer, context, ifStatements);
-                        return;
-                    }
-                    // Run else statements
-                    runStatements(writer, context, elseStatements);
-                };
                 while (true) {
                     nextType = getNextStatementType(template, end);
                     if (nextType == null) {
                         [statement, end] = getStatement(template, end);
                         ifStatements.push(statement);
                     } else if (nextType === 'else') {
-                        [tokens, end] = getTokens(template, end + 2);
-                        if (tokens.length == 1) {
-                            while (true) {
-                                [statement, end] = getStatement(template, end);
-                                if (!statement) break;
-                                elseStatements.push(statement);
-                            }
-                            const ifStatement = createIfStatement();
-                            return [ifStatement, end];
-                        }
-                        throw new Error();
+                        break;
                     } else if (nextType === 'end') {
                         [statement, end] = getStatement(template, end); // Read {{end}}
+                        const ifStatement = (writer, context) => {
+                            if (ifExpr(context)) runStatements(writer, context, ifStatements);
+                        };
+                        return [ifStatement, end];
+                    }
+                }
+
+                const createIfStatement = () => (writer, context) => {
+                    if (ifExpr(context)) {
+                        runStatements(writer, context, ifStatements);
+                        return;
+                    }
+                    for (const [expr, statements] of elseIfGroups) {
+                        if (expr(context)) {
+                            runStatements(writer, context, statements);
+                            return;
+                        }
+                    }
+                    runStatements(writer, context, elseStatements);
+                };
+                // Has else here as the next type
+                while (true) {
+                    [tokens, end] = getTokens(template, end + 2);
+                    if (tokens.length == 1) {
+                        while (true) {
+                            [statement, end] = getStatement(template, end);
+                            if (!statement) break;
+                            elseStatements.push(statement);
+                        }
                         const ifStatement = createIfStatement();
                         return [ifStatement, end];
+                    }
+                    // Else-if here
+                    if (tokens[1] !== 'if') throw new Error('if missing from else-if statement');
+                    let elseIfExpr = getExpression(tokens, 2);
+                    let elseIfStatements = [];
+                    while (true) {
+                        nextType = getNextStatementType(template, end);
+                        if (nextType == null) {
+                            [statement, end] = getStatement(template, end);
+                            elseIfStatements.push(statement);
+                            continue;
+                        } else if (nextType === 'end') {
+                            elseIfGroups.push([elseIfExpr, elseIfStatements]);
+                            [statement, end] = getStatement(template, end); // Read {{end}}
+                            const ifStatement = createIfStatement();
+                            return [ifStatement, end];
+                        } else if (nextType === 'else') {
+                            elseIfGroups.push([elseIfExpr, elseIfStatements]);
+                            break;
+                        }
+                        throw new Error();
                     }
                 }
             } else if (first === 'end') {
