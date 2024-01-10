@@ -62,7 +62,21 @@ var Vancat = (function () {
             else throw new Error(`Expression expected after: ${tokens.slice(0, start).join(' ')}`);
         }
         if (tokens.length - start == 1) return getTokenAsExpression(tokens[start]);
-        throw new Error();
+        const f = tokens[start];
+        if (f.includes('.')) throw new Error(`Function name cannot contain a dot character: ${f}`);
+        const argGroups = getArgGroups(tokens, start + 1);
+        if (argGroups.length == 1) {
+            const expr = argGroups[0];
+            return (context) => {
+                const func = getFunc(f, context);
+                return func(expr(context));
+            };
+        }
+        return (context) => {
+            const func = getFunc(f, context);
+            const args = argGroups.map((expr) => expr(context));
+            return func.apply(null, args);
+        };
     };
     const getTokenAsExpression = (token) => {
         const subTokens = token.split('.');
@@ -84,7 +98,16 @@ var Vancat = (function () {
             for (let i = 1; i < subTokens.length; i++) o = o[subTokens[i]];
             return o;
         };
-        throw new Error();
+    };
+    const getArgGroups = (tokens, index) => {
+        const expressions = [];
+        while (index < tokens.length) expressions.push(getTokenAsExpression(tokens[index++]));
+        return expressions;
+    };
+    const getFunc = (f, context) => {
+        const func = context.get(f);
+        if (typeof func !== 'function') throw new Error(`value of ${f} was not a function`);
+        return func;
     };
     const runStatements = (writer, context, statements) => {
         for (const stmt of statements)
