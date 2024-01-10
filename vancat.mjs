@@ -143,7 +143,7 @@ var Vancat = (function () {
                             const ifStatement = createIfStatement();
                             return [ifStatement, end];
                         }
-                        throw new Error();
+                        throw new Error('Tag not closed with }}');
                     }
                 }
             } else if (first === 'end') {
