@@ -53,6 +53,8 @@ var tests = [
     ['{{if x}}  {{else if x}}   {{end}}    {{x}}', { x: 2 }, '    2'],
     ['{{if gt x 2}}more than two{{end}}', { x: 4 }, 'more than two'],
     ['{{if lt x 2}}less than two{{end}}', { x: 1 }, 'less than two'],
+    ['{{sum $.n $.n $.n $.n}}', { n: 25 }, '100'],
+    ['{{for x in $}}{{1.5}},{{end}}', ['', '', '', ''], '1.5,1.5,1.5,1.5,'],
 ];
 
 var helpers = {
@@ -70,6 +72,11 @@ var helpers = {
     },
     lt: function (o1, o2) {
         return o1 < o2;
+    },
+    sum: function (...args) {
+        let total = 0;
+        for (const arg of args) total += arg;
+        return total;
     },
 };
 
