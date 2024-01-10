@@ -51,6 +51,8 @@ var tests = [
     ['{{if x}}{{end}}{{x}}', { x: 2 }, '2'],
     ['{{if gt $.v1 $.v2}}YES{{end}}', { v1: 6, v2: 3 }, 'YES'],
     ['{{if x}}  {{else if x}}   {{end}}    {{x}}', { x: 2 }, '    2'],
+    ['{{if gt x 2}}more than two{{end}}', { x: 4 }, 'more than two'],
+    ['{{if lt x 2}}less than two{{end}}', { x: 1 }, 'less than two'],
 ];
 
 var helpers = {

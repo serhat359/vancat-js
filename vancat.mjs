@@ -210,6 +210,8 @@ var Vancat = (function () {
         };
     };
     const getTokenAsExpression = (token) => {
+        const parsedNumber = Number(token);
+        if (!isNaN(parsedNumber)) return (context) => parsedNumber;
         const subTokens = token.split('.');
         const t = subTokens[0];
         if (subTokens.length == 1) {
