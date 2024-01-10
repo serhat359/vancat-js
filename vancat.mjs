@@ -71,17 +71,19 @@ var Vancat = (function () {
                 let statement;
                 while (true) {
                     nextType = getNextStatementType(template, end);
-                    if (nextType == null) {
-                        [statement, end] = getStatement(template, end);
-                        ifStatements.push(statement);
-                    } else if (nextType === 'else') {
+                    if (nextType === 'else') {
                         break;
-                    } else if (nextType === 'end') {
+                    }
+                    end = skipWhiteSpace(template, end);
+                    if (nextType === 'end') {
                         [statement, end] = getStatement(template, end); // Read {{end}}
                         const ifStatement = (writer, context) => {
                             if (ifExpr(context)) runStatements(writer, context, ifStatements);
                         };
                         return [ifStatement, end];
+                    } else {
+                        [statement, end] = getStatement(template, end);
+                        ifStatements.push(statement);
                     }
                 }
 
@@ -116,6 +118,11 @@ var Vancat = (function () {
                     let elseIfStatements = [];
                     while (true) {
                         nextType = getNextStatementType(template, end);
+                        if (nextType === 'else') {
+                            elseIfGroups.push([elseIfExpr, elseIfStatements]);
+                            break;
+                        }
+                        end = skipWhiteSpace(template, end);
                         if (nextType == null) {
                             [statement, end] = getStatement(template, end);
                             elseIfStatements.push(statement);
@@ -125,9 +132,6 @@ var Vancat = (function () {
                             [statement, end] = getStatement(template, end); // Read {{end}}
                             const ifStatement = createIfStatement();
                             return [ifStatement, end];
-                        } else if (nextType === 'else') {
-                            elseIfGroups.push([elseIfExpr, elseIfStatements]);
-                            break;
                         }
                         throw new Error();
                     }
@@ -156,9 +160,7 @@ var Vancat = (function () {
         return [statements, end];
     };
     const getNextStatementType = (template, start) => {
-        while (start < template.length && /\s/.test(template[start]))
-            // checking for whitespace
-            start++;
+        start = skipWhiteSpace(template, start);
         if (start + 1 < template.length && template[start] === '{' && template[start + 1] === '{') {
             start += 2;
             while (template[start] === ' ') start++;
@@ -168,6 +170,10 @@ var Vancat = (function () {
             return template.substring(tempStart, start);
         }
         return null;
+    };
+    const skipWhiteSpace = (template, start) => {
+        while (start < template.length && /\s/.test(template[start])) start++;
+        return start;
     };
     const getTokens = (template, i) => {
         const tokens = [];

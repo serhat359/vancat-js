@@ -41,6 +41,16 @@ var tests = [
         { y: 0, x: 0 },
         'the number is on left',
     ],
+    ['{{if arr.length}}{{for a in arr}}x{{end}}{{end}}', { arr: [1] }, 'x'],
+    [
+        '{{if arr.length}}{{for a in arr}}{{end}}{{else}}No record found{{end}}',
+        { arr: [] },
+        'No record found',
+    ],
+    ['{{if isPos a.b}}YES{{else}}NO{{end}}', { a: { b: 2.762736723 } }, 'YES'],
+    ['{{if x}}{{end}}{{x}}', { x: 2 }, '2'],
+    ['{{if gt $.v1 $.v2}}YES{{end}}', { v1: 6, v2: 3 }, 'YES'],
+    ['{{if x}}  {{else if x}}   {{end}}    {{x}}', { x: 2 }, '    2'],
 ];
 
 var helpers = {
@@ -49,6 +59,15 @@ var helpers = {
     },
     fixed: function (x) {
         return x.toFixed(2);
+    },
+    isPos: function (d) {
+        return d > 0;
+    },
+    gt: function (o1, o2) {
+        return o1 > o2;
+    },
+    lt: function (o1, o2) {
+        return o1 < o2;
     },
 };
 
