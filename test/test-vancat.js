@@ -130,6 +130,21 @@ for (let k of badCompileTests) {
     throw new Error(`${k} should have thrown error`);
 }
 
+var badRuntimeTests = [
+    ['{{x.data.a.a}}', {}],
+    ['{{for x in data}}{{end}}', null],
+    ['{{for x in data}}{{end}}', { data: null }],
+];
+for (let [template, data] of badRuntimeTests) {
+    var renderer = Vancat.compile(template);
+    try {
+        renderer(data);
+    } catch (e) {
+        continue;
+    }
+    throw new Error(`${template} should have thrown error`);
+}
+
 function* testGenerator() {
     yield 1;
     yield 2;

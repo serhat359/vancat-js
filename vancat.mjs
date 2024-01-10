@@ -227,6 +227,16 @@ var Vancat = (function () {
         };
     };
     const getTokenAsExpression = (token) => {
+        const expr = getTokenAsExpressionInner(token);
+        return (context) => {
+            try {
+                return expr(context);
+            } catch (e) {
+                throw new Error(`Error while resolving: ${token}`);
+            }
+        };
+    };
+    const getTokenAsExpressionInner = (token) => {
         const parsedNumber = Number(token);
         if (!isNaN(parsedNumber)) return (context) => parsedNumber;
         const subTokens = token.split('.');
