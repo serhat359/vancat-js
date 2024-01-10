@@ -28,6 +28,8 @@ var tests = [
         { texts: ['foo', 'bar', 'baz', '<script>'] },
         '<foo><bar><baz><&lt;script&gt;>',
     ],
+    ['the number is {{if b}}there{{end}}', { b: 2 }, 'the number is there'],
+    ['the number is {{if b}}there{{else}}NOT there{{end}}', { b: 0 }, 'the number is NOT there'],
 ];
 
 var helpers = {

@@ -62,6 +62,43 @@ var Vancat = (function () {
                     }
                 };
                 return [forStatement, end];
+            } else if (first === 'if') {
+                const ifExpr = getExpression(tokens, 1);
+                let ifStatements = [];
+                let elseStatements = [];
+                let nextType;
+                let statement;
+                const createIfStatement = () => (writer, context) => {
+                    if (ifExpr(context)) {
+                        runStatements(writer, context, ifStatements);
+                        return;
+                    }
+                    // Run else statements
+                    runStatements(writer, context, elseStatements);
+                };
+                while (true) {
+                    nextType = getNextStatementType(template, end);
+                    if (nextType == null) {
+                        [statement, end] = getStatement(template, end);
+                        ifStatements.push(statement);
+                    } else if (nextType === 'else') {
+                        [tokens, end] = getTokens(template, end + 2);
+                        if (tokens.length == 1) {
+                            while (true) {
+                                [statement, end] = getStatement(template, end);
+                                if (!statement) break;
+                                elseStatements.push(statement);
+                            }
+                            const ifStatement = createIfStatement();
+                            return [ifStatement, end];
+                        }
+                        throw new Error();
+                    } else if (nextType === 'end') {
+                        [statement, end] = getStatement(template, end); // Read {{end}}
+                        const ifStatement = createIfStatement();
+                        return [ifStatement, end];
+                    }
+                }
             } else if (first === 'end') {
                 return [null, end];
             }
@@ -84,6 +121,20 @@ var Vancat = (function () {
             statements.push(statement);
         }
         return [statements, end];
+    };
+    const getNextStatementType = (template, start) => {
+        while (start < template.length && /\s/.test(template[start]))
+            // checking for whitespace
+            start++;
+        if (start + 1 < template.length && template[start] === '{' && template[start + 1] === '{') {
+            start += 2;
+            while (template[start] === ' ') start++;
+            const tempStart = start++;
+            while (start < template.length && template[start] !== '}' && template[start] !== ' ')
+                start++;
+            return template.substring(tempStart, start);
+        }
+        return null;
     };
     const getTokens = (template, i) => {
         const tokens = [];
