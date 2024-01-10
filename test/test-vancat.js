@@ -19,6 +19,15 @@ var tests = [
     ['numbers count: {{text.length}}', { text: 'hello world' }, 'numbers count: 11'],
     ['{{fixed number}}', { number: 2.762736723 }, '2.76'],
     ['{{fixed a.b}}', { a: { b: 2.762736723 } }, '2.76'],
+    ['numbers: {{for x in num.inner}}{{x}},{{end}}', { num: { inner: [1, 2, 3] } }, 'numbers: 1,2,3,'],
+    ['{{for e in num}}{{e.x}}{{end}}', { num: [{ x: 2 }, { x: 5 }, { x: 8 }] }, '258'],
+    ['{{for e , i in num}}{{i}}{{end}}', { num: [{ x: 2 }, { x: 5 }, { x: 8 }] }, '012'],
+    ['{{for e in $}}{{e}}{{end}}', [2, 5, 8], '258'],
+    [
+        '{{for x in texts}}<{{x}}>{{end}}',
+        { texts: ['foo', 'bar', 'baz', '<script>'] },
+        '<foo><bar><baz><&lt;script&gt;>',
+    ],
 ];
 
 var helpers = {

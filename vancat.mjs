@@ -35,6 +35,37 @@ var Vancat = (function () {
         const i = template.indexOf('{{', start);
         if (i == start) {
             let [tokens, end] = getTokens(template, i + 2);
+            const first = tokens[0];
+            if (first === 'for') {
+                let loopType = tokens[2];
+                if (loopType !== 'in') {
+                    const inIndex = tokens.indexOf('in');
+                    if (inIndex > 2) {
+                        tokens = mergeTokens(tokens, inIndex);
+                        loopType = tokens[2];
+                    } else throw new Error('Missing "in" in for-loop');
+                }
+                const [t1, t2] = tokens[1].split(',');
+                const loopValuesExpr = getExpression(tokens, 3);
+                let statements;
+                [statements, end] = getInnerStatements(template, end);
+                const forStatement = (writer, context) => {
+                    const loopValues = loopValuesExpr(context);
+                    if (!isIterable(loopValues))
+                        throw new Error(`Value of '${tokens.slice(3).join(' ')}' was not iterable`);
+                    let i = 0;
+                    for (const val of loopValues) {
+                        context.set(t1, val);
+                        if (t2) context.set(t2, i);
+                        runStatements(writer, context, statements);
+                        i++;
+                    }
+                };
+                return [forStatement, end];
+            } else if (first === 'end') {
+                return [null, end];
+            }
+            // Get expression as statement
             const expr = getExpression(tokens, 0);
             const stmt = (writer, context) => writer(htmlEncode(expr(context)));
             return [stmt, end];
@@ -43,6 +74,16 @@ var Vancat = (function () {
         } else {
             return [template.substring(start, i), i];
         }
+    };
+    const getInnerStatements = (template, end) => {
+        const statements = [];
+        let statement;
+        while (true) {
+            [statement, end] = getStatement(template, end);
+            if (!statement) break;
+            statements.push(statement);
+        }
+        return [statements, end];
     };
     const getTokens = (template, i) => {
         const tokens = [];
@@ -109,6 +150,11 @@ var Vancat = (function () {
         if (typeof func !== 'function') throw new Error(`value of ${f} was not a function`);
         return func;
     };
+    const mergeTokens = (tokens, inIndex) => [
+        tokens[0],
+        tokens.slice(1, inIndex).join(''),
+        ...tokens.slice(inIndex),
+    ];
     const runStatements = (writer, context, statements) => {
         for (const stmt of statements)
             if (typeof stmt === 'string') writer(stmt);
@@ -124,6 +170,10 @@ var Vancat = (function () {
                   .replace(/'/g, '&#39;')
                   .replace(/"/g, '&#34;')
             : s;
+    };
+    const isIterable = (obj) => {
+        if (obj == null) return false;
+        return typeof obj[Symbol.iterator] === 'function';
     };
     return { compile };
 })();
