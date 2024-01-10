@@ -56,6 +56,7 @@ var tests = [
     ['{{sum $.n $.n $.n $.n}}', { n: 25 }, '100'],
     ['{{for x in $}}{{1.5}},{{end}}', ['', '', '', ''], '1.5,1.5,1.5,1.5,'],
     ['{{for k,v in $}}{{k}}:{{v}},{{end}}', { name: 'Jack', age: 25 }, 'name:Jack,age:25,'],
+    ['{{for x in $}}{{x}},{{end}}', testGenerator(), '1,2,3,'],
 ];
 
 var helpers = {
@@ -96,6 +97,12 @@ for (let k of badCompileTests) {
         continue;
     }
     throw new Error(`${k} should have thrown error`);
+}
+
+function* testGenerator() {
+    yield 1;
+    yield 2;
+    yield 3;
 }
 
 console.log('SUCCESS!!!');
