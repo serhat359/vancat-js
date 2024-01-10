@@ -70,6 +70,20 @@ var Vancat = (function () {
         if (subTokens.length == 1) {
             return (context) => context.get(t);
         }
+        if (subTokens.length == 2) {
+            const k = subTokens[1];
+            return (context) => context.get(t)[k];
+        }
+        if (subTokens.length == 3) {
+            const k1 = subTokens[1];
+            const k2 = subTokens[2];
+            return (context) => context.get(t)[k1][k2];
+        }
+        return (context) => {
+            let o = context.get(t);
+            for (let i = 1; i < subTokens.length; i++) o = o[subTokens[i]];
+            return o;
+        };
         throw new Error();
     };
     const runStatements = (writer, context, statements) => {

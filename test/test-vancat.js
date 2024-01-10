@@ -9,6 +9,11 @@ var tests = [
     ['hello {{w}}', { w: 'world' }, 'hello world'],
     ['hello {{w}}', { w: '<script>' }, 'hello &lt;script&gt;'],
     ['{{h}} {{w}}', { h: 'hello', w: 'world' }, 'hello world'],
+    ['{{a.b}}', { a: { b: 'text' } }, 'text'],
+    ['{{a.b.c}}', { a: { b: { c: 'text' } } }, 'text'],
+    ['{{a.b.c.d}}', { a: { b: { c: { d: 'text' } } } }, 'text'],
+    ['{{a.b.c.d.e}}', { a: { b: { c: { d: { e: 'text' } } } } }, 'text'],
+    ['{{a.b.c.d.e.f}}', { a: { b: { c: { d: { e: { f: 'text' } } } } } }, 'text'],
 ];
 
 for (const [template, data, expected] of tests) {
