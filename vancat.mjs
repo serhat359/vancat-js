@@ -12,7 +12,7 @@ var Vancat = (function () {
         let statement;
         while (end < template.length) {
             [statement, end] = getStatement(template, end);
-            if (!statement) throw new Error('Unexpected end token');
+            if (!statement) err('Unexpected end token');
             statements.push(statement);
         }
         return (data, helpers = {}) => {
@@ -33,7 +33,7 @@ var Vancat = (function () {
         };
     };
     const getStatement = (template, start) => {
-        if (start == template.length) throw new Error('Expected {{end}} but not found');
+        if (start == template.length) err('Expected {{end}} but not found');
         const i = template.indexOf('{{', start);
         if (i == start) {
             let [tokens, end] = getTokens(template, i + 2);
@@ -45,7 +45,7 @@ var Vancat = (function () {
                     if (inIndex > 2) {
                         tokens = mergeTokens(tokens, inIndex);
                         loopType = tokens[2];
-                    } else throw new Error('Missing "in" in for-loop');
+                    } else err('Missing "in" in for-loop');
                 }
                 const [t1, t2] = tokens[1].split(',');
                 const loopValuesExpr = getExpression(tokens, 3);
@@ -54,7 +54,7 @@ var Vancat = (function () {
                 const forStatement = (writer, context) => {
                     const loopValues = loopValuesExpr(context);
                     if (loopValues == null)
-                        throw new Error(`Value of '${tokens.slice(3).join(' ')}' was not iterable`);
+                        err(`Value of '${tokens.slice(3).join(' ')}' was not iterable`);
                     if (isIterable(loopValues)) {
                         let i = 0;
                         for (const val of loopValues) {
@@ -123,7 +123,7 @@ var Vancat = (function () {
                         return [ifStatement, end];
                     }
                     // Else-if here
-                    if (tokens[1] !== 'if') throw new Error('if missing from else-if statement');
+                    if (tokens[1] !== 'if') err('if missing from else-if statement');
                     let elseIfExpr = getExpression(tokens, 2);
                     let elseIfStatements = [];
                     while (true) {
@@ -143,13 +143,13 @@ var Vancat = (function () {
                             const ifStatement = createIfStatement();
                             return [ifStatement, end];
                         }
-                        throw new Error('Tag not closed with }}');
+                        err('Tag not closed with }}');
                     }
                 }
             } else if (first === 'end') {
                 return [null, end];
             } else if (first === 'else') {
-                throw new Error('Unexpected else token');
+                err('Unexpected else token');
             } else if (first === 'set') {
                 const varName = tokens[1];
                 const expr = getExpression(tokens, 2);
@@ -200,18 +200,18 @@ var Vancat = (function () {
             const start = i++;
             while (i < template.length && template[i] !== '}' && template[i] !== ' ') i++;
             const token = template.substring(start, i);
-            if (!token) throw new Error('Tag not closed with }}');
+            if (!token) err('Tag not closed with }}');
             tokens.push(token);
         }
     };
     const getExpression = (tokens, start) => {
         if (tokens.length - start == 0 || tokens[start] === '.') {
-            if (tokens.length == 0) throw new Error('Expression cannot be empty');
-            else throw new Error(`Expression expected after: ${tokens.slice(0, start).join(' ')}`);
+            if (tokens.length == 0) err('Expression cannot be empty');
+            else err(`Expression expected after: ${tokens.slice(0, start).join(' ')}`);
         }
         if (tokens.length - start == 1) return getTokenAsExpression(tokens[start]);
         const f = tokens[start];
-        if (f.includes('.')) throw new Error(`Function name cannot contain a dot character: ${f}`);
+        if (f.includes('.')) err(`Function name cannot contain a dot character: ${f}`);
         const argGroups = getArgGroups(tokens, start + 1);
         if (argGroups.length == 1) {
             const expr = argGroups[0];
@@ -232,7 +232,7 @@ var Vancat = (function () {
             try {
                 return expr(context);
             } catch (e) {
-                throw new Error(`Error while resolving: ${token}`);
+                err(`Error while resolving: ${token}`);
             }
         };
     };
@@ -241,7 +241,7 @@ var Vancat = (function () {
         if (!isNaN(parsedNumber)) return (context) => parsedNumber;
         const subTokens = token.split('.');
         for (const x of subTokens) {
-            if (!x) throw new Error(`Invalid member access expression: ${token}`);
+            if (!x) err(`Invalid member access expression: ${token}`);
         }
         const t = subTokens[0];
         if (subTokens.length == 1) {
@@ -269,7 +269,7 @@ var Vancat = (function () {
     };
     const getFunc = (f, context) => {
         const func = context.get(f);
-        if (typeof func !== 'function') throw new Error(`value of ${f} was not a function`);
+        if (typeof func !== 'function') err(`value of ${f} was not a function`);
         return func;
     };
     const mergeTokens = (tokens, inIndex) => [
@@ -296,6 +296,9 @@ var Vancat = (function () {
     const isIterable = (obj) => {
         if (obj == null) return false;
         return typeof obj[Symbol.iterator] === 'function';
+    };
+    const err = (msg) => {
+        throw new Error(msg);
     };
     return { compile, registerHelper };
 })();
