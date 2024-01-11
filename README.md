@@ -69,7 +69,34 @@ var helpers = {
   }
 }
 var result = renderer(data, helpers)
-console.log(result) // Outputs 'John's current balance is 14.78'
+console.log(result) // Outputs "John's current balance is 14.78"
+```
+
+## Expressions
+
+### Variable
+
+Variables are created whenever any `for` loop or `set` directive is used. `$` variable can be used to access the object `renderer` function is called with.
+
+Examples:
+```
+{{x}}
+{{x.length}}
+{{x.data.length}}
+{{$}}
+{{$.length}}
+```
+
+### Function call
+
+If the expression contains multiple variable-like parts separated by spaces then it will execute a function call. The functions can be supplied in a plain object by setting the second argument for the `renderer` function.
+
+Examples:
+```
+{{format x}}
+{{format $}}
+{{format x 2}}
+{{format arg0 arg1 arg2 arg3 ... and so on}}
 ```
 
 # More documentation will be added later
