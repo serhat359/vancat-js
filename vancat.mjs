@@ -7,8 +7,42 @@ var Vancat = (function () {
     const registeredHelpers = {
         not: (x) => !x,
     };
+    const registeredPartials = {};
     const registerHelper = (name, f) => (registeredHelpers[name] = f);
+    const registerPartial = (name, template) =>
+        (registeredPartials[name] = compileToStatements(template));
     const compile = (template) => {
+        const statements = compileToStatements(template);
+        return (data, helpers = {}) => {
+            const parts = [];
+            const writer = (x) => parts.push(x);
+            const context = {
+                contextData: { $: data },
+                get(key) {
+                    return (
+                        this.contextData[key] ??
+                        helpers[key] ??
+                        registeredHelpers[key] ??
+                        this.contextData.$[key]
+                    );
+                },
+                set(name, val) {
+                    this.contextData[name] = val;
+                },
+                replaceContextData(data) {
+                    const old = this.contextData;
+                    this.contextData = { $: data };
+                    return old;
+                },
+                setContextData(data) {
+                    this.contextData = data;
+                },
+            };
+            runStatements(writer, context, statements);
+            return parts.join('');
+        };
+    };
+    const compileToStatements = (template) => {
         const statements = [];
         let end = 0;
         let statement;
@@ -17,27 +51,28 @@ var Vancat = (function () {
             if (!statement) err('Unexpected end token');
             statements.push(statement);
         }
-        return (data, helpers = {}) => {
-            const parts = [];
-            const writer = (x) => parts.push(x);
-            const contextData = {};
-            contextData['$'] = data;
-            const context = {
-                get(key) {
-                    return contextData[key] ?? helpers[key] ?? registeredHelpers[key] ?? data[key];
-                },
-                set(name, val) {
-                    contextData[name] = val;
-                },
-            };
-            runStatements(writer, context, statements);
-            return parts.join('');
-        };
+        return statements;
     };
     const getStatement = (template, start) => {
         if (start == template.length) err('Expected {{end}} but not found');
         const i = template.indexOf('{{', start);
         if (i == start) {
+            if (template[i + 2] === '>') {
+                // handle partial here
+                const [tokens, end] = getTokens(template, i + 3);
+                const templateName = tokens[0];
+                if (!templateName) err('Template name not specified');
+                const expr = getExpression(tokens, 1);
+                const statement = (writer, context) => {
+                    const partialStatements = registeredPartials[templateName];
+                    if (!partialStatements) err(`Partial not registered: ${templateName}`);
+                    const newData = expr(context);
+                    const oldData = context.replaceContextData(newData);
+                    runStatements(writer, context, partialStatements);
+                    context.setContextData(oldData);
+                };
+                return [statement, end];
+            }
             let [tokens, end] = getTokens(template, i + 2);
             const first = tokens[0];
             if (first === 'for') {
@@ -302,6 +337,6 @@ var Vancat = (function () {
     const err = (msg) => {
         throw new Error(msg);
     };
-    return { compile, registerHelper };
+    return { compile, registerHelper, registerPartial };
 })();
 export default Vancat;

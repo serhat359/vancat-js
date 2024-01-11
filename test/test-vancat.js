@@ -1,5 +1,14 @@
 import Vancat from '../vancat.mjs';
 
+var usersData = {
+    id: -1,
+    username: 'should not display',
+    users: [
+        { id: 1, username: 'user1', numbers: [1, 2, 3] },
+        { id: 2, username: 'user2', numbers: [4, 5] },
+    ],
+};
+
 var tests = [
     ['', {}, ''],
     ['hello world', {}, 'hello world'],
@@ -57,7 +66,15 @@ var tests = [
     ['{{for x in $}}{{x}},{{end}}', testGenerator(), '1,2,3,'],
     ['{{for e in $}}{{set k fixed e}}{{k}},{{end}}', [1, 2, 3], '1.00,2.00,3.00,'],
     ["{{if not data}}It's not{{else}}it is{{end}}", { data: false }, "It's not"],
+    [
+        '{{id}},{{for x in users}}{{>user x}},{{end}}::{{id}}::{{$.username}}',
+        usersData,
+        '-1,1 user1:123,2 user2:45,::-1::should not display',
+    ],
+    ['{{>user $.user}}', { id: -1, user: { numbers: [] } }, ' :'],
 ];
+
+Vancat.registerPartial('user', '{{id}} {{username}}:{{for x in numbers}}{{x}}{{end}}');
 
 var helpers = {
     upper: function (s) {
@@ -126,6 +143,8 @@ var badCompileTests = [
     '{{if $}}{{',
     '{{if $}}{{end}}{{',
     '{{if $}}{{end}}{{else',
+    '{{>}}',
+    '{{>none}}',
 ];
 
 for (let k of badCompileTests) {
@@ -141,6 +160,7 @@ var badRuntimeTests = [
     ['{{x.data.a.a}}', {}],
     ['{{for x in data}}{{end}}', null],
     ['{{for x in data}}{{end}}', { data: null }],
+    ['{{>none 2}}', {}],
 ];
 for (let [template, data] of badRuntimeTests) {
     var renderer = Vancat.compile(template);
