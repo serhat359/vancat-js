@@ -82,8 +82,6 @@ var helpers = {
     },
 };
 
-Vancat.registerHelper('not', (x) => !x);
-
 for (const [template, data, expected] of tests) {
     const renderer = Vancat.compile(template);
     const result = renderer(data, helpers);

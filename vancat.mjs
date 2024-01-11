@@ -4,7 +4,9 @@
  */
 
 var Vancat = (function () {
-    const registeredHelpers = {};
+    const registeredHelpers = {
+        not: (x) => !x,
+    };
     const registerHelper = (name, f) => (registeredHelpers[name] = f);
     const compile = (template) => {
         const statements = [];
