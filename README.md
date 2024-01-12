@@ -33,7 +33,7 @@ console.log(result) // Outputs 'John Doe'
   addEventListener("load", () => { // Run the code when the page is loaded
     var template = document.getElementById("template").innerHTML;
     var renderer = Vancat.compile(template);
-    var result = renderer({ data: ["foo","bar","baz"] });
+    var result = renderer({ data: ["foo", "bar", "baz"] });
     document.getElementById("target").innerHTML = result;
   });
 </script>
@@ -48,13 +48,15 @@ This code renders the HTML below and sets it to #target in the page:
 </ul>
 ```
 
+Values are always HTML escaped before being appended to the result text.
+
 # Features
 
 ## Formatting Data
 
 Vancat allows you to define functions which convert data before generating the result.
 
-Here's an example
+Here's an example:
 
 ```js
 var template = "{{name}}'s current balance is {{fixed2 balance}}"
@@ -89,7 +91,7 @@ Examples:
 
 ### Function call
 
-If the expression contains multiple variable-like parts separated by spaces then it will execute a function call. The functions can be supplied in a plain object by setting the second argument for the `renderer` function.
+If the expression contains multiple variable-like parts separated by spaces then it will execute a function call. The functions can be supplied in a plain object by setting the second argument for the `renderer` function. Functions require at least one argument, otherwise the templating engine thinks it's a variable.
 
 Examples:
 ```
@@ -99,9 +101,91 @@ Examples:
 {{format arg0 arg1 arg2 arg3 ... and so on}}
 ```
 
+## Statements
+
+### If and If-Else
+
+Traditional `if`, `else-if` and `else` statements are all suppored.
+
+Syntax:
+
+```
+// if with no else
+{{if <expression>}}
+ ...
+{{end}}
+
+// if with else
+{{if <expression>}}
+ ...
+{{else}}
+ ...
+{{end}}
+
+// if with else if and else
+{{if <expression>}}
+ ...
+{{else if <expression>}}
+ ...
+{{else}}
+ ...
+{{end}}
+```
+
+### For loop (iterating over array)
+
+Syntax:
+
+```
+{{for x in <expression>}}
+  // use x here
+{{end}}
+```
+
+### For loop with index (iterating over array)
+
+Syntax:
+
+```
+{{for x,i in <expression>}}
+  // i will be the index of the element
+{{end}}
+```
+
+### For loop (iterating over object)
+
+Syntax:
+
+```
+{{for value,key in <expression>}}
+  // this loop is the equivalent of for-in loops in JavaScript
+{{end}}
+```
+
+### Set
+
+Set allows you to define a variable and set a value to it.
+
+Syntax:
+
+```
+{{set <varName> <expression>}}
+```
+
+Example:
+```
+{{set val index data i}}   // Calls `index` function with the args `data` and `i` and sets the result to `val`
+
+{{val}}
+{{val}}
+```
+
+The variables created this way will keep their data until the end of renderering.
+
 # More documentation will be added later
 
 # Limitations
 
-  * Raw HTML is currently not supported
+  * Raw HTML is currently not supported.
   * Numbers are supported but other constant literals are not supported, so no `null`, `true`, `false`, `"text"`, etc.
+  * Indexing when iterating over an object is currently not supported.
