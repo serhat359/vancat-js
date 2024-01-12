@@ -1,3 +1,9 @@
+(function (global, factory) {
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+  typeof define === 'function' && define.amd ? define(factory) :
+  (global = global || self, global.Vancat = factory());
+}(this, (function () { 'use strict';
+
 /*!
  * vancat.js - Fast and small templating engine
  * https://github.com/serhat359/vancat-js
@@ -102,8 +108,8 @@ var Vancat = (function () {
                         }
                     } else {
                         for (const key in loopValues) {
-                            context.set(t1, key);
-                            context.set(t2, loopValues[key]);
+                            context.set(t2, key);
+                            context.set(t1, loopValues[key]);
                             runStatements(writer, context, statements);
                         }
                     }
@@ -339,4 +345,6 @@ var Vancat = (function () {
     };
     return { compile, registerHelper, registerPartial };
 })();
-export default Vancat;
+return Vancat;
+
+})));

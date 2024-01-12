@@ -1,4 +1,4 @@
-import Vancat from '../vancat.mjs';
+import Vancat from '../vancat.js';
 
 var usersData = {
     id: -1,
@@ -62,7 +62,7 @@ var tests = [
     ['{{if lt x 2}}less than two{{end}}', { x: 1 }, 'less than two'],
     ['{{sum $.n $.n $.n $.n}}', { n: 25 }, '100'],
     ['{{for x in $}}{{1.5}},{{end}}', ['', '', '', ''], '1.5,1.5,1.5,1.5,'],
-    ['{{for k,v in $}}{{k}}:{{v}},{{end}}', { name: 'Jack', age: 25 }, 'name:Jack,age:25,'],
+    ['{{for v,k in $}}{{k}}:{{v}},{{end}}', { name: 'Jack', age: 25 }, 'name:Jack,age:25,'],
     ['{{for x in $}}{{x}},{{end}}', testGenerator(), '1,2,3,'],
     ['{{for e in $}}{{set k fixed e}}{{k}},{{end}}', [1, 2, 3], '1.00,2.00,3.00,'],
     ["{{if not data}}It's not{{else}}it is{{end}}", { data: false }, "It's not"],
