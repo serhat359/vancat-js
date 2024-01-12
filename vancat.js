@@ -38,6 +38,9 @@
                     set(name, val) {
                         this.contextData[name] = val;
                     },
+                    getDirect(name) {
+                        return this.contextData[name];
+                    },
                     replaceContextData(data) {
                         const old = this.contextData;
                         this.contextData = { $: data };
@@ -101,6 +104,8 @@
                         const loopValues = loopValuesExpr(context);
                         if (loopValues == null)
                             err(`Value of '${tokens.slice(3).join(' ')}' was not iterable`);
+                        const t1Old = context.getDirect(t1);
+                        const t2Old = context.getDirect(t2);
                         if (isIterable(loopValues)) {
                             let i = 0;
                             for (const val of loopValues) {
@@ -116,6 +121,8 @@
                                 runStatements(writer, context, statements);
                             }
                         }
+                        context.set(t1, t1Old);
+                        context.set(t2, t2Old);
                     };
                     return [forStatement, end];
                 } else if (first === 'if') {
