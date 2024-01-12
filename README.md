@@ -98,7 +98,8 @@ Examples:
 {{format x}}
 {{format $}}
 {{format x 2}}
-{{format arg0 arg1 arg2 arg3 ... and so on}}
+{{call x -2.5}}
+{{call arg0 arg1 arg2 arg3 ... and so on}}
 ```
 
 ## Statements
