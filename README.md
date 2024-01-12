@@ -106,7 +106,7 @@ Examples:
 
 ### If and If-Else
 
-Traditional `if`, `else-if` and `else` statements are all suppored.
+Traditional `if`, `else-if` and `else` statements are all suppored. Body of an if statement is executed if the value from the `<expression>` is [truthy](https://developer.mozilla.org/en-US/docs/Glossary/Truthy).
 
 Syntax:
 
