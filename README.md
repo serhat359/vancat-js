@@ -182,7 +182,89 @@ Example:
 
 The variables created this way will keep their data until the end of renderering.
 
-# More documentation will be added later
+## Helper Functions
+
+You can define functions that allow you to either format data or help you write complex expressions such as equality checking or comparison.
+
+One way of using helper functions is putting the functions in an object and passing it to the `renderer` function as the second argument.
+
+Example:
+```js
+// prepare data before this point
+
+var helpers = {
+  isnull: (x) => x == null,
+  isnotnull: (x) => x != null,
+  gt: (x,y) => x > y,
+  eq: (x,y) => x === y,
+  sum: (...args) => { let sum = 0; for (const x of args) sum += x; return sum; },
+}
+var result = renderer(data, helpers)
+```
+
+Another way is registering helper function directly.
+
+Example:
+```js
+Vancat.registerHelper("isnull", x => {
+  return x == null
+})
+Vancat.registerHelper("gt", (x,y) => {
+  return x > y
+})
+
+var result = renderer(data)
+```
+
+## Partials
+
+Parts of a template that are specified multiple times can be extracted into a partial template. You can do so by first registering the partial with `Vancat.registerPartial` function. After this you can call the partial just like a function call but with `>` characted before it.
+
+Example:
+```js
+Vancat.registerPartial("list", 
+`<ul class="list-group">
+  {{for x in $}}
+    <li class="list-group-item">{{x}}</li>
+  {{end}}
+</ul>`)
+
+var data = {
+  successful: ["hello", "world"],
+  failed: ["foo-", "b-ar", "-baz"],
+}
+
+var template = 
+`<span>Successful items:</span>
+{{>list successful}}
+<span>Failed items:</span>
+{{>list failed}}`
+
+var renderer = Vancat.compile(template)
+var result = renderer(data)
+```
+
+This code renders the HTML below:
+
+```html
+<span>Successful items:</span>
+<ul class="list-group">
+  <li class="list-group-item">hello</li>
+  <li class="list-group-item">world</li>
+</ul>
+<span>Failed items:</span>
+<ul class="list-group">
+  <li class="list-group-item">foo-</li>
+  <li class="list-group-item">b-ar</li>
+  <li class="list-group-item">-baz</li>
+</ul>
+```
+
+Syntax for calling partial:
+
+```
+{{>templateName <expression>}}  // Expression should not contain (<) or (>) characters
+```
 
 # Limitations
 
