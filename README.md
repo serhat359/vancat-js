@@ -180,6 +180,8 @@ Example:
 {{val}}
 ```
 
+`index` is not a pre-defined function but you can easily define it as `Vancat.registerHelper("index", (data, i) => data[i])`
+
 The variables created this way will keep their data until the end of renderering.
 
 ## Helper Functions
@@ -264,6 +266,36 @@ Syntax for calling partial:
 
 ```
 {{>templateName <expression>}}  // Expression should not contain (<) or (>) characters
+```
+
+# Common Use Cases
+
+## Rendering like String.join
+
+Template: 
+```
+{{for x,i in items}}
+  {{if i}}
+  <div class="divider"></div>
+  {{end}}
+  <div class="content">{{x}}</div>
+{{end}}
+```
+
+Data:
+```js
+var data = {
+  items: ["foo","bar","baz"],
+}
+```
+
+Output:
+```html
+<div class="content">foo</div>
+<div class="divider"></div>
+<div class="content">bar</div>
+<div class="divider"></div>
+<div class="content">baz</div>
 ```
 
 # Limitations
