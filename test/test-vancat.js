@@ -75,6 +75,7 @@ var tests = [
     ['{{for x in inner}}{{x}},{{end}}:{{x}}', { inner: [1, 2, 3], x: 10 }, '1,2,3,:10'],
     ['{{for v,k in inner}}{{end}}{{k}}', { inner: { prop: 2 }, prop: 10 }, ''],
     ['{{for v,prop in inner}}{{end}}{{prop}}', { inner: { prop: 2 }, prop: 10 }, '10'],
+    ['{{add x -2.5}}', { x: -1 }, '-3.5'],
 ];
 
 Vancat.registerPartial('user', '{{id}} {{username}}:{{for x in numbers}}{{x}}{{end}}');
@@ -85,6 +86,9 @@ var helpers = {
     },
     fixed: function (x) {
         return x.toFixed(2);
+    },
+    add: function (x, y) {
+        return x + y;
     },
     isPos: function (d) {
         return d > 0;
