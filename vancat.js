@@ -26,28 +26,28 @@
                 const parts = [];
                 const writer = (x) => parts.push(x);
                 const context = {
-                    contextData: { $: data },
-                    get(key) {
-                        return (
-                            this.contextData[key] ??
-                            helpers[key] ??
-                            registeredHelpers[key] ??
-                            this.contextData.$[key]
-                        );
+                    d: { $: data }, // Data of context
+                    g(key) {
+                        // Get variable result
+                        return this.d[key] ?? helpers[key] ?? registeredHelpers[key] ?? this.d.$[key];
                     },
-                    set(name, val) {
-                        this.contextData[name] = val;
+                    s(name, val) {
+                        // Set variable
+                        this.d[name] = val;
                     },
-                    getDirect(name) {
-                        return this.contextData[name];
+                    gd(name) {
+                        // Get direct
+                        return this.d[name];
                     },
-                    replaceContextData(data) {
-                        const old = this.contextData;
-                        this.contextData = { $: data };
+                    r(data) {
+                        // Replace variable
+                        const old = this.d;
+                        this.d = { $: data };
                         return old;
                     },
-                    setContextData(data) {
-                        this.contextData = data;
+                    sd(data) {
+                        // Set the entire context data
+                        this.d = data;
                     },
                 };
                 runStatements(writer, context, statements);
@@ -79,9 +79,9 @@
                         const partialStatements = registeredPartials[templateName];
                         if (!partialStatements) err(`Partial not registered: ${templateName}`);
                         const newData = expr(context);
-                        const oldData = context.replaceContextData(newData);
+                        const oldData = context.r(newData);
                         runStatements(writer, context, partialStatements);
-                        context.setContextData(oldData);
+                        context.sd(oldData);
                     };
                     return [statement, end];
                 }
@@ -104,25 +104,25 @@
                         const loopValues = loopValuesExpr(context);
                         if (loopValues == null)
                             err(`Value of '${tokens.slice(3).join(' ')}' was not iterable`);
-                        const t1Old = context.getDirect(t1);
-                        const t2Old = context.getDirect(t2);
+                        const t1Old = context.gd(t1);
+                        const t2Old = context.gd(t2);
                         if (isIterable(loopValues)) {
                             let i = 0;
                             for (const val of loopValues) {
-                                context.set(t1, val);
-                                if (t2) context.set(t2, i);
+                                context.s(t1, val);
+                                if (t2) context.s(t2, i);
                                 runStatements(writer, context, statements);
                                 i++;
                             }
                         } else {
                             for (const key in loopValues) {
-                                context.set(t2, key);
-                                context.set(t1, loopValues[key]);
+                                context.s(t2, key);
+                                context.s(t1, loopValues[key]);
                                 runStatements(writer, context, statements);
                             }
                         }
-                        context.set(t1, t1Old);
-                        context.set(t2, t2Old);
+                        context.s(t1, t1Old);
+                        context.s(t2, t2Old);
                     };
                     return [forStatement, end];
                 } else if (first === 'if') {
@@ -206,7 +206,7 @@
                 } else if (first === 'set') {
                     const varName = tokens[1];
                     const expr = getExpression(tokens, 2);
-                    const statement = (writer, context) => context.set(varName, expr(context));
+                    const statement = (writer, context) => context.s(varName, expr(context));
                     return [statement, end];
                 }
                 // Get expression as statement
@@ -298,19 +298,19 @@
             }
             const t = subTokens[0];
             if (subTokens.length == 1) {
-                return (context) => context.get(t);
+                return (context) => context.g(t);
             }
             if (subTokens.length == 2) {
                 const k = subTokens[1];
-                return (context) => context.get(t)[k];
+                return (context) => context.g(t)[k];
             }
             if (subTokens.length == 3) {
                 const k1 = subTokens[1];
                 const k2 = subTokens[2];
-                return (context) => context.get(t)[k1][k2];
+                return (context) => context.g(t)[k1][k2];
             }
             return (context) => {
-                let o = context.get(t);
+                let o = context.g(t);
                 for (let i = 1; i < subTokens.length; i++) o = o[subTokens[i]];
                 return o;
             };
@@ -321,7 +321,7 @@
             return expressions;
         };
         const getFunc = (f, context) => {
-            const func = context.get(f);
+            const func = context.g(f);
             if (typeof func !== 'function') err(`value of ${f} was not a function`);
             return func;
         };
