@@ -60,8 +60,8 @@
             let statement;
             while (end < template.length) {
                 [statement, end] = getStatement(template, end);
-                if (!statement) err('Unexpected end token');
-                statements.push(statement);
+                if (statement === null) err('Unexpected end token');
+                if (statement !== undefined) statements.push(statement);
             }
             return statements;
         };
@@ -69,6 +69,11 @@
             if (start == template.length) err('Expected {{end}} but not found');
             const i = template.indexOf('{{', start);
             if (i == start) {
+                if (template[i + 2] === '/' && template[i + 3] === '*') {
+                    // handle comment
+                    const commentEnd = template.indexOf('*/}}', i + 4);
+                    return [undefined, commentEnd + 4]; // Return undefined for comment
+                }
                 if (template[i + 2] === '>') {
                     // handle partial here
                     const [tokens, end] = getTokens(template, i + 3);
@@ -200,7 +205,7 @@
                         }
                     }
                 } else if (first === 'end') {
-                    return [null, end];
+                    return [null, end]; // Return null for {{end}}
                 } else if (first === 'else') {
                     err('Unexpected else token');
                 } else if (first === 'set') {
@@ -224,8 +229,8 @@
             let statement;
             while (true) {
                 [statement, end] = getStatement(template, end);
-                if (!statement) break;
-                statements.push(statement);
+                if (statement === null) break;
+                if (statement !== undefined) statements.push(statement);
             }
             return [statements, end];
         };

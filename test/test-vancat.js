@@ -76,6 +76,12 @@ var tests = [
     ['{{for v,k in inner}}{{end}}{{k}}', { inner: { prop: 2 }, prop: 10 }, ''],
     ['{{for v,prop in inner}}{{end}}{{prop}}', { inner: { prop: 2 }, prop: 10 }, '10'],
     ['{{add x -2.5}}', { x: -1 }, '-3.5'],
+    ['{{/**/}}', { '/**/': 2 }, ''],
+    ['  {{/**/}}', {}, '  '],
+    ['  {{/**/}}  ', {}, '    '],
+    ['{{for x in $}} {{/* this is a comment*/}}{{end}}', [1, 2], '  '],
+    ['{{for x in $}}{{/* this is a comment*/}} {{end}}', [1, 2], '  '],
+    ['{{for x in $}} {{/* this is a comment*/}} {{end}}', [1, 2], '    '],
 ];
 
 Vancat.registerPartial('user', '{{id}} {{username}}:{{for x in numbers}}{{x}}{{end}}');
@@ -109,7 +115,9 @@ var helpers = {
 for (const [template, data, expected] of tests) {
     const renderer = Vancat.compile(template);
     const result = renderer(data, helpers);
-    if (result !== expected) throw new Error();
+    if (result !== expected) {
+        throw new Error();
+    }
 }
 
 var badCompileTests = [
