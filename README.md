@@ -178,12 +178,19 @@ Example:
 {{set val index data i}}   // Calls `index` function with the args `data` and `i` and sets the result to `val`
 
 {{val}}
-{{val}}
 ```
 
 `index` is not a pre-defined function but you can easily define it as `Vancat.registerHelper("index", (data, i) => data[i])`
 
 The variables created this way will keep their data until the end of renderering.
+
+### Comments
+
+Syntax:
+
+```
+{{/* This is a comment and will not be rendered or executed */}}
+```
 
 ## Helper Functions
 
@@ -301,6 +308,6 @@ Output:
 
 # Limitations
 
-  * Raw HTML is currently not supported.
+  * Raw HTML is currently not supported as I did not see the need for it.
   * Numbers are supported but other constant literals are not supported, so no `null`, `true`, `false`, `"text"`, etc.
   * Indexing when iterating over an object is currently not supported.
