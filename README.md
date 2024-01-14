@@ -286,7 +286,7 @@ Template:
   {{if i}}
   <div class="divider"></div>
   {{end}}
-  <div class="content">{{x}}</div>
+  <div>{{x}}</div>
 {{end}}
 ```
 
@@ -299,11 +299,11 @@ var data = {
 
 Output:
 ```html
-<div class="content">foo</div>
+<div>foo</div>
 <div class="divider"></div>
-<div class="content">bar</div>
+<div>bar</div>
 <div class="divider"></div>
-<div class="content">baz</div>
+<div>baz</div>
 ```
 
 # Limitations
