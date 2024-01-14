@@ -310,4 +310,4 @@ Output:
 
   * Raw HTML is currently not supported as I did not see the need for it.
   * Numbers are supported but other constant literals are not supported, so no `null`, `true`, `false`, `"text"`, etc.
-  * Indexing when iterating over an object is currently not supported.
+  * Accessing loop index (`i`) when iterating over an object is currently not supported.
