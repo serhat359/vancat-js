@@ -95,7 +95,7 @@ If the expression contains multiple variable-like parts separated by spaces then
 
 Examples:
 ```
-{{format x}}
+{{format x}}    // Function calls can be used in places for <expression>
 {{format $}}
 {{format x 2}}
 {{call x -2.5}}
