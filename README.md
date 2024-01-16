@@ -22,7 +22,7 @@ console.log(result) // Outputs 'John Doe'
 
 <script id="template" type="text/template">
   <ul>
-    {{for x in data}}
+    {{for x in items}}
       <li>{{x}}</li>
     {{end}}
   </ul>
@@ -33,7 +33,8 @@ console.log(result) // Outputs 'John Doe'
   addEventListener("load", () => { // Run the code when the page is loaded
     var template = document.getElementById("template").innerHTML;
     var renderer = Vancat.compile(template);
-    var result = renderer({ data: ["foo", "bar", "baz"] });
+    var data = { items: ["foo", "bar", "baz"] };   // or get from URL: `await fetch(url).then(r => r.json())`
+    var result = renderer(data);
     document.getElementById("target").innerHTML = result;
   });
 </script>
@@ -84,7 +85,7 @@ Examples:
 ```
 {{x}}
 {{x.length}}
-{{x.data.length}}
+{{x.items.length}}
 {{$}}
 {{$.length}}
 ```
@@ -175,12 +176,12 @@ Syntax:
 
 Example:
 ```
-{{set val index data i}}   // Calls `index` function with the args `data` and `i` and sets the result to `val`
+{{set val index items i}}   // Calls `index` function with the args `items` and `i` and sets the result to `val`
 
 {{val}}
 ```
 
-`index` is not a pre-defined function but you can easily define it as `Vancat.registerHelper("index", (data, i) => data[i])`
+`index` is not a pre-defined function but you can easily define it as `Vancat.registerHelper("index", (items, i) => items[i])`
 
 The variables created this way will keep their data until the end of renderering.
 
