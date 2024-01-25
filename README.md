@@ -5,13 +5,13 @@ Vancat is a fast and really small templating engine (only 4 KiB minified!). It's
 # Example
 
 ```js
-var template = "{{fname}} {{lname}}"
-var renderer = Vancat.compile(template)
-var data = {
+const template = "{{fname}} {{lname}}"
+const renderer = Vancat.compile(template)
+const data = {
   fname: "John",
   lname: "Doe",
 }
-var result = renderer(data)
+const result = renderer(data)
 console.log(result) // Outputs 'John Doe'
 ```
 
@@ -31,10 +31,10 @@ console.log(result) // Outputs 'John Doe'
 <script src="https://unpkg.com/vancat@latest/vancat.min.js"></script>
 <script type="text/javascript">
   addEventListener("load", () => { // Run the code when the page is loaded
-    var template = document.getElementById("template").innerHTML;
-    var renderer = Vancat.compile(template);
-    var data = { items: ["foo", "bar", "baz"] };   // or get from URL: `await fetch(url).then(r => r.json())`
-    var result = renderer(data);
+    const template = document.getElementById("template").innerHTML;
+    const renderer = Vancat.compile(template);
+    const data = { items: ["foo", "bar", "baz"] };   // or get from URL: `await fetch(url).then(r => r.json())`
+    const result = renderer(data);
     document.getElementById("target").innerHTML = result;
   });
 </script>
@@ -60,18 +60,18 @@ Vancat allows you to define functions which convert data before generating the r
 Here's an example:
 
 ```js
-var template = "{{name}}'s current balance is {{fixed2 balance}}"
-var renderer = Vancat.compile(template)
-var data = {
+const template = "{{name}}'s current balance is {{fixed2 balance}}"
+const renderer = Vancat.compile(template)
+const data = {
   name: "John",
   balance: 14.78347993477834,
 }
-var helpers = {
+const helpers = {
   fixed2: (x) => {
     return x.toFixed(2);
   }
 }
-var result = renderer(data, helpers)
+const result = renderer(data, helpers)
 console.log(result) // Outputs "John's current balance is 14.78"
 ```
 
@@ -203,14 +203,14 @@ Example:
 ```js
 // prepare data before this point
 
-var helpers = {
+const helpers = {
   isnull: (x) => x == null,
   isnotnull: (x) => x != null,
   gt: (x,y) => x > y,
   eq: (x,y) => x === y,
   sum: (...args) => { let sum = 0; for (const x of args) sum += x; return sum; },
 }
-var result = renderer(data, helpers)
+const result = renderer(data, helpers)
 ```
 
 Another way is registering helper function directly.
@@ -224,7 +224,7 @@ Vancat.registerHelper("gt", (x,y) => {
   return x > y
 })
 
-var result = renderer(data)
+const result = renderer(data)
 ```
 
 ## Partials
@@ -240,19 +240,19 @@ Vancat.registerPartial("list",
   {{end}}
 </ul>`)
 
-var data = {
+const data = {
   successful: ["hello", "world"],
   failed: ["foo-", "b-ar", "-baz"],
 }
 
-var template = 
+const template = 
 `<span>Successful items:</span>
 {{>list successful}}
 <span>Failed items:</span>
 {{>list failed}}`
 
-var renderer = Vancat.compile(template)
-var result = renderer(data)
+const renderer = Vancat.compile(template)
+const result = renderer(data)
 ```
 
 This code renders the HTML below:
@@ -293,7 +293,7 @@ Template:
 
 Data:
 ```js
-var data = {
+const data = {
   items: ["foo","bar","baz"],
 }
 ```
