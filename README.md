@@ -307,6 +307,34 @@ Output:
 <div>baz</div>
 ```
 
+## Handling the No Items Found Case
+
+When you render elements of an array in a specific way, you might want to render something entirely different when there are no elements. Using `if-else` in this case is really useful.
+
+Template:
+```
+{{if not items.length}}
+  <span>No items found</span>
+{{else}}
+  <table>
+    <thead>
+      <th>Column1</th>
+      <th>Column2</th>
+    </thead>
+    <tbody>
+    {{for x in items}}
+      <tr>
+        <td>{{x.column1}}</td>
+        <td>{{x.column2}}</td>
+      </tr>
+    {{end}}
+    </tbody>
+  </table>
+{{end}}
+```
+
+`not` is a pre-defined function that returns `true` if the argument is falsy.
+
 # Limitations
 
   * Raw HTML is currently not supported as I did not see the need for it.
