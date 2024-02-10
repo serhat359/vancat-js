@@ -335,6 +335,35 @@ Template:
 
 `not` is a pre-defined function that returns `true` if the argument is falsy.
 
+## Conditional Rendering HTML Attributes
+
+Braces can be used with attributes as well as HTML content. If you want to render attibutes or content conditionally you can use `if` statement for those scenarios. You might have to define a custom function for your condition logic however since operators like `>`, `<` or `==` are not supported.
+
+Helpers:
+```js
+const helpers = {
+  gt: (x,y) => x > y,
+}
+```
+
+Template:
+```
+<table>
+  <thead>
+    <th>Name</th>
+    <th>Value</th>
+  </thead>
+  <tbody>
+  {{for x in items}}
+    <tr>
+      <td>{{x.name}}</td>
+      <td {{if gt x.value 1000}}class="danger"{{end}}>{{x.value}}</td>
+    </tr>
+  {{end}}
+  </tbody>
+</table>
+```
+
 # Limitations
 
   * Raw HTML is currently not supported as I did not see the need for it.
