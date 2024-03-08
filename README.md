@@ -183,7 +183,7 @@ Example:
 
 `index` is not a pre-defined function but you can easily define it as `Vancat.registerHelper("index", (items, i) => items[i])`
 
-The variables created this way will keep their data until the end of renderering.
+The variables created this way will not go out of scope until the rendering of the HTML is finished.
 
 ### Comments
 
