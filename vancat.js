@@ -255,8 +255,20 @@
             while (true) {
                 while (template[i] === ' ') i++;
                 if (template[i] === '}' && template[i + 1] === '}') return [tokens, i + 2];
+                if (template[i] === '|') {
+                    tokens.push('|');
+                    i++;
+                    continue;
+                }
                 const start = i++;
-                while (i < template.length && template[i] !== '}' && template[i] !== ' ') i++;
+                while (
+                    i < template.length &&
+                    template[i] !== '}' &&
+                    template[i] !== ' ' &&
+                    template[i] !== '|'
+                ) {
+                    i++;
+                }
                 const token = template.substring(start, i);
                 if (!token) err('Tag not closed with }}');
                 tokens.push(token);
@@ -267,21 +279,56 @@
                 if (tokens.length == 0) err('Expression cannot be empty');
                 else err(`Expression expected after: ${tokens.slice(0, start).join(' ')}`);
             }
-            if (tokens.length - start == 1) return getTokenAsExpression(tokens[start]);
-            const f = tokens[start];
-            if (f.includes('.')) err(`Function name cannot contain a dot character: ${f}`);
-            const argGroups = getArgGroups(tokens, start + 1);
-            if (argGroups.length == 1) {
-                const expr = argGroups[0];
-                return (context) => {
+            const pipeIndex = tokens.findIndex((x, i) => i >= start && x === '|');
+            const end = pipeIndex >= 0 ? pipeIndex : tokens.length;
+            let firstExpr;
+            if (end - start == 1) {
+                firstExpr = getTokenAsExpression(tokens[start]);
+            } else {
+                const f = tokens[start];
+                assertFunction(f);
+                const argGroups = getArgGroups(tokens, start + 1);
+                if (argGroups.length == 1) {
+                    const expr = argGroups[0];
+                    return (context) => {
+                        const func = getFunc(f, context);
+                        return func(expr(context));
+                    };
+                }
+                firstExpr = (context) => {
                     const func = getFunc(f, context);
-                    return func(expr(context));
+                    const args = argGroups.map((expr) => expr(context));
+                    return func.apply(null, args);
                 };
             }
+            if (pipeIndex < 0) return firstExpr;
+            const pipeExprs = [];
+            let end2 = pipeIndex;
+            let pipeTokens;
+            while (end2 != tokens.length) {
+                [pipeTokens, end2] = getPipeTokens(tokens, end2 + 1);
+                const [f, ...argTokens] = pipeTokens;
+                assertFunction(f);
+                if (argTokens.length > 0) {
+                    const argExprs = argTokens.map(getTokenAsExpression);
+                    pipeExprs.push((lastValue, context) => {
+                        const func = getFunc(f, context);
+                        const args = argExprs.map((expr) => expr(context));
+                        return func.call(this, lastValue, ...args);
+                    });
+                } else {
+                    pipeExprs.push((lastValue, context) => {
+                        const func = getFunc(f, context);
+                        return func(lastValue);
+                    });
+                }
+            }
             return (context) => {
-                const func = getFunc(f, context);
-                const args = argGroups.map((expr) => expr(context));
-                return func.apply(null, args);
+                let lastValue = firstExpr(context);
+                for (const pipeExpr of pipeExprs) {
+                    lastValue = pipeExpr(lastValue, context);
+                }
+                return lastValue;
             };
         };
         const getTokenAsExpression = (token) => {
@@ -325,6 +372,14 @@
             while (index < tokens.length) expressions.push(getTokenAsExpression(tokens[index++]));
             return expressions;
         };
+        const getPipeTokens = (tokens, i) => {
+            const tok = [];
+            for (; i < tokens.length; i++) {
+                if (tokens[i] === '|') return [tok, i];
+                tok.push(tokens[i]);
+            }
+            return [tok, i];
+        };
         const getFunc = (f, context) => {
             const func = context.g(f);
             if (typeof func !== 'function') err(`value of ${f} was not a function`);
@@ -354,6 +409,9 @@
         const isIterable = (obj) => {
             if (obj == null) return false;
             return typeof obj[Symbol.iterator] === 'function';
+        };
+        const assertFunction = (f) => {
+            if (f.includes('.')) err(`Function name cannot contain a dot character: ${f}`);
         };
         const err = (msg) => {
             throw new Error(msg);

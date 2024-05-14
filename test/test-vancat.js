@@ -82,6 +82,17 @@ var tests = [
     ['{{for x in $}} {{/* this is a comment*/}}{{end}}', [1, 2], '  '],
     ['{{for x in $}}{{/* this is a comment*/}} {{end}}', [1, 2], '  '],
     ['{{for x in $}} {{/* this is a comment*/}} {{end}}', [1, 2], '    '],
+    ['{{w|upper}}', { w: 'world' }, 'WORLD'],
+    ['{{w | upper}}', { w: 'world' }, 'WORLD'],
+    ['hello {{w|upper}}', { w: 'world' }, 'hello WORLD'],
+    ['hello {{w|upper|upper}}', { w: 'world' }, 'hello WORLD'],
+    ['hello {{upper w|upper|lower}}', { w: 'world' }, 'hello world'],
+    ['hello {{upper w|upper 1 0 |lower 1 0}}', { w: 'world' }, 'hello world'],
+    ['{{x|fixed}}', { x: 2 }, '2.00'],
+    ['{{5|fixed}}', { x: 2 }, '5.00'],
+    ['{{index arr 1|fixedN 3}}', { arr: [3, 4, 5] }, '4.000'],
+    ['{{index arr 1|fixedN 3|comma}}', { arr: [3, 4, 5] }, '4,000'],
+    ['{{index arr 1 | fixedN 3 | comma}}', { arr: [3, 4, 5] }, '4,000'],
 ];
 
 Vancat.registerPartial('user', '{{id}} {{username}}:{{for x in numbers}}{{x}}{{end}}');
@@ -90,8 +101,14 @@ var helpers = {
     upper: function (s) {
         return s.toUpperCase();
     },
+    lower: function (s) {
+        return s.toLowerCase();
+    },
     fixed: function (x) {
         return x.toFixed(2);
+    },
+    fixedN: function (x, n) {
+        return x.toFixed(n);
     },
     add: function (x, y) {
         return x + y;
@@ -109,6 +126,12 @@ var helpers = {
         let total = 0;
         for (const arg of args) total += arg;
         return total;
+    },
+    index: function (arr, i) {
+        return arr[i];
+    },
+    comma: function (s) {
+        return s.replaceAll('.', ',');
     },
 };
 
