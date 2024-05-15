@@ -1,6 +1,6 @@
 # Vancat JS
 
-Vancat is a fast and really small templating engine (only 4 KiB minified!). It's main purpose is generating HTML for client side rendering in browsers.
+Vancat is a fast and really small templating engine (only 4.6 KiB minified!). It's main purpose is generating HTML for client side rendering in browsers.
 
 # Example
 
@@ -103,11 +103,23 @@ Examples:
 {{call arg0 arg1 arg2 arg3 ... and so on}}
 ```
 
+### Function call (with pipelining)
+
+The pipe (`|`) character is another way to call functions but with higher precedence. It can be used to execute multiple function calls in one expression. The result of the previous expression will be passed to the function after the pipe character as the first argument. Optionally any arguments specified after that function will also be passed to the function call.
+
+Examples:
+```
+{{x | format}}     // Equivalent of {{format x}}
+{{x | fixed 2}}    // Equivalent of {{fixed x 2}}
+{{lastof arr | fixed 2}}
+{{lastof arr | fixed 2 | comma}}
+```
+
 ## Statements
 
 ### If and If-Else
 
-Traditional `if`, `else-if` and `else` statements are all suppored. Body of an if statement is executed if the value from the `<expression>` is [truthy](https://developer.mozilla.org/en-US/docs/Glossary/Truthy).
+Traditional `if`, `else-if` and `else` statements are all supported. Body of an if statement is executed if the value from the `<expression>` is [truthy](https://developer.mozilla.org/en-US/docs/Glossary/Truthy).
 
 Syntax:
 
@@ -229,7 +241,7 @@ const result = renderer(data)
 
 ## Partials
 
-Parts of a template that are specified multiple times can be extracted into a partial template. You can do so by first registering the partial with `Vancat.registerPartial` function. After this you can call the partial just like a function call but with `>` characted before it.
+Parts of a template that are specified multiple times can be extracted into a partial template. You can do so by first registering the partial with `Vancat.registerPartial` function. After this you can call the partial just like a function call but with `>` character before it.
 
 Example:
 ```js
@@ -337,7 +349,7 @@ Template:
 
 ## Conditional Rendering HTML Attributes
 
-Braces can be used with attributes as well as HTML content. If you want to render attibutes or content conditionally you can use `if` statement for those scenarios. You might have to define a custom function for your condition logic however since operators like `>`, `<` or `==` are not supported.
+Braces can be used with attributes as well as HTML content. If you want to render attributes or content conditionally you can use `if` statement for those scenarios. You might have to define a custom function for your condition logic however since operators like `>`, `<` or `==` are not supported.
 
 Helpers:
 ```js
