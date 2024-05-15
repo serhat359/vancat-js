@@ -314,7 +314,7 @@
                     pipeExprs.push((lastValue, context) => {
                         const func = getFunc(f, context);
                         const args = argExprs.map((expr) => expr(context));
-                        return func.call(this, lastValue, ...args);
+                        return func(lastValue, ...args);
                     });
                 } else {
                     pipeExprs.push((lastValue, context) => {
