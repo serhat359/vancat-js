@@ -142,7 +142,6 @@
                         if (nextType === 'else') {
                             break;
                         }
-                        end = skipWhiteSpace(template, end);
                         if (nextType === 'end') {
                             [statement, end] = getStatement(template, end); // Read {{end}}
                             const ifStatement = (writer, context) => {
@@ -190,7 +189,6 @@
                                 elseIfGroups.push([elseIfExpr, elseIfStatements]);
                                 break;
                             }
-                            end = skipWhiteSpace(template, end);
                             if (nextType == null) {
                                 [statement, end] = getStatement(template, end);
                                 elseIfStatements.push(statement);
@@ -235,7 +233,6 @@
             return [statements, end];
         };
         const getNextStatementType = (template, start) => {
-            start = skipWhiteSpace(template, start);
             if (start + 1 < template.length && template[start] === '{' && template[start + 1] === '{') {
                 start += 2;
                 while (template[start] === ' ') start++;
@@ -245,10 +242,6 @@
                 return template.substring(tempStart, start);
             }
             return null;
-        };
-        const skipWhiteSpace = (template, start) => {
-            while (start < template.length && /\s/.test(template[start])) start++;
-            return start;
         };
         const getTokens = (template, i) => {
             const tokens = [];
