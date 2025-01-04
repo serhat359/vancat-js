@@ -95,6 +95,14 @@ var tests = [
     ['{{index arr 1|fixedN 3}}', { arr: [3, 4, 5] }, '4.000'],
     ['{{index arr 1|fixedN 3|comma}}', { arr: [3, 4, 5] }, '4,000'],
     ['{{index arr 1 | fixedN 3 | comma}}', { arr: [3, 4, 5] }, '4,000'],
+    ['{{ret ""}}', {}, ''],
+    ["{{ret ''}}", {}, ''],
+    ['{{ret "hello world"}}', {}, 'hello world'],
+    ["{{ret 'hello world'}}", {}, 'hello world'],
+    ['{{for x in $}}{{eq x "bar"}} {{end}}', ['foo', 'bar', 'baz'], 'false true false '],
+    ['{{concat "s1 s2" "s3 s4"}}', {}, 's1 s2s3 s4'],
+    ["{{concat 's1 s2' 's3 s4'}}", {}, 's1 s2s3 s4'],
+    ['{{concat \'s1 s2\' "s3 s4"}}', {}, 's1 s2s3 s4'],
 ];
 
 Vancat.registerPartial('user', '{{id}} {{username}}:{{for x in numbers}}{{x}}{{end}}');
@@ -118,6 +126,9 @@ var helpers = {
     isPos: function (d) {
         return d > 0;
     },
+    eq: function (o1, o2) {
+        return o1 === o2;
+    },
     gt: function (o1, o2) {
         return o1 > o2;
     },
@@ -134,6 +145,12 @@ var helpers = {
     },
     comma: function (s) {
         return s.replaceAll('.', ',');
+    },
+    ret: function (v) {
+        return v;
+    },
+    concat: function (s1, s2) {
+        return s1 + s2;
     },
 };
 
@@ -185,6 +202,12 @@ var badCompileTests = [
     '{{if $}}{{end}}{{else',
     '{{>}}',
     '{{>none}}',
+    '{{"}}',
+    '{{"hello}}',
+    "{{'}}",
+    "{{'hello}}",
+    "{{hello'}}",
+    '{{hello"}}',
 ];
 
 for (let k of badCompileTests) {

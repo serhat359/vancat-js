@@ -254,14 +254,20 @@
                     continue;
                 }
                 const start = i++;
-                while (
-                    i < template.length &&
-                    template[i] !== '}' &&
-                    template[i] !== ' ' &&
-                    template[i] !== '|'
-                ) {
+                let c = template[start];
+                if (c === '"' || c === "'") {
+                    // Read string literal
+                    while (i < template.length && template[i] !== c) i++;
+                    if (i == template.length) err('String not closed');
                     i++;
+                } else {
+                    // Read variable name or keyword
+                    while (i < template.length && (c = template[i]) !== '}' && c !== ' ' && c !== '|') {
+                        if (c == "'" || c == '"') err(`Unexpected character: ${c}`);
+                        i++;
+                    }
                 }
+
                 const token = template.substring(start, i);
                 if (!token) err('Tag not closed with }}');
                 tokens.push(token);
@@ -337,6 +343,10 @@
         const getTokenAsExpressionInner = (token) => {
             const parsedNumber = Number(token);
             if (!isNaN(parsedNumber)) return (context) => parsedNumber;
+            if (token[0] == '"' || token[0] == "'") {
+                const text = token.substring(1, token.length - 1);
+                return (context) => text;
+            }
             const subTokens = token.split('.');
             for (const x of subTokens) {
                 if (!x) err(`Invalid member access expression: ${token}`);
