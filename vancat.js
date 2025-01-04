@@ -341,6 +341,10 @@
             };
         };
         const getTokenAsExpressionInner = (token) => {
+            if (token === 'true') return (context) => true;
+            if (token === 'false') return (context) => false;
+            if (token === 'null') return (context) => null;
+            if (token === 'undefined') return (context) => undefined;
             const parsedNumber = Number(token);
             if (!isNaN(parsedNumber)) return (context) => parsedNumber;
             if (token[0] == '"' || token[0] == "'") {

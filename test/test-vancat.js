@@ -103,6 +103,10 @@ var tests = [
     ['{{concat "s1 s2" "s3 s4"}}', {}, 's1 s2s3 s4'],
     ["{{concat 's1 s2' 's3 s4'}}", {}, 's1 s2s3 s4'],
     ['{{concat \'s1 s2\' "s3 s4"}}', {}, 's1 s2s3 s4'],
+    ['{{true}}', {}, 'true'],
+    ['{{false}}', {}, 'false'],
+    ['{{null}}', {}, ''],
+    ['{{undefined}}', {}, ''],
 ];
 
 Vancat.registerPartial('user', '{{id}} {{username}}:{{for x in numbers}}{{x}}{{end}}');
