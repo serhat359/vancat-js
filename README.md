@@ -1,6 +1,6 @@
 # Vancat JS
 
-Vancat is a fast and really small templating engine (only 4.6 KiB minified!). It's main purpose is generating HTML for client side rendering in browsers.
+Vancat is a fast and really small templating engine (only 4.8 KiB minified!). It's main purpose is generating HTML for client side rendering in browsers.
 
 # Example
 
@@ -100,12 +100,14 @@ Examples:
 {{format $}}
 {{format x 2}}
 {{call x -2.5}}
+{{call x 'text'}}
+{{call x "text"}}
 {{call arg0 arg1 arg2 arg3 ... and so on}}
 ```
 
 ### Function call (with pipelining)
 
-The pipe (`|`) character is another way to call functions but with higher precedence. It can be used to execute multiple function calls in one expression. The result of the previous expression will be passed to the function after the pipe character as the first argument. Optionally any arguments specified after that function will also be passed to the function call.
+The pipe (`|`) character is another way to call functions but with lower precedence (normal function calls have higher priority). It can be used to execute multiple function calls in one expression. The result of the previous expression will be passed to the function after the pipe character as the first argument. Optionally any arguments specified after that function will also be passed to the function call.
 
 Examples:
 ```
@@ -379,5 +381,5 @@ Template:
 # Limitations
 
   * Raw HTML is currently not supported as I did not see the need for it.
-  * Numbers are supported but other constant literals are not supported, so no `null`, `true`, `false`, `"text"`, etc.
+  * In string literals, escaping characters (with backslash) is not supported.
   * Accessing loop index (`i`) when iterating over an object is currently not supported.
