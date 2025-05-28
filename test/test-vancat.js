@@ -107,6 +107,7 @@ var tests = [
     ['{{false}}', {}, 'false'],
     ['{{null}}', {}, ''],
     ['{{undefined}}', {}, ''],
+    ['{{for x in items}},{{x}}{{end}}', { x: 10, items: [1, 2, null] }, ',1,2,'],
 ];
 
 Vancat.registerPartial('user', '{{id}} {{username}}:{{for x in numbers}}{{x}}{{end}}');

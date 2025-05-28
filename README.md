@@ -1,6 +1,6 @@
 # Vancat JS
 
-Vancat is a fast and really small templating engine (only 4.8 KiB minified!). It's main purpose is generating HTML for client side rendering in browsers.
+Vancat is a fast and really small templating engine (only 4.9 KiB minified!). It's main purpose is generating HTML for client side rendering in browsers.
 
 # Example
 

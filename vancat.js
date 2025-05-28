@@ -29,15 +29,16 @@
                     d: { $: data }, // Data of context
                     g(key) {
                         // Get variable result
-                        return this.d[key] ?? helpers[key] ?? registeredHelpers[key] ?? this.d.$[key];
+                        if (key in this.d) return this.d[key];
+                        return helpers[key] ?? registeredHelpers[key] ?? this.d.$[key];
                     },
                     s(name, val) {
                         // Set variable
                         this.d[name] = val;
                     },
-                    gd(name) {
+                    gd(key) {
                         // Get direct
-                        return this.d[name];
+                        return [this.d[key], key in this.d];
                     },
                     r(data) {
                         // Replace variable
@@ -48,6 +49,10 @@
                     sd(data) {
                         // Set the entire context data
                         this.d = data;
+                    },
+                    de(key) {
+                        // Delete variable
+                        delete this.d[key];
                     },
                 };
                 runStatements(writer, context, statements);
@@ -109,8 +114,8 @@
                         const loopValues = loopValuesExpr(context);
                         if (loopValues == null)
                             err(`Value of '${tokens.slice(3).join(' ')}' was not iterable`);
-                        const t1Old = context.gd(t1);
-                        const t2Old = context.gd(t2);
+                        const [t1Old, t1OldExists] = context.gd(t1);
+                        const [t2Old, t2OldExists] = context.gd(t2);
                         if (isIterable(loopValues)) {
                             let i = 0;
                             for (const val of loopValues) {
@@ -126,8 +131,11 @@
                                 runStatements(writer, context, statements);
                             }
                         }
-                        context.s(t1, t1Old);
-                        context.s(t2, t2Old);
+                        if (t1OldExists) context.s(t1, t1Old);
+                        else context.de(t1);
+
+                        if (t2OldExists) context.s(t2, t2Old);
+                        else context.de(t2);
                     };
                     return [forStatement, end];
                 } else if (first === 'if') {
